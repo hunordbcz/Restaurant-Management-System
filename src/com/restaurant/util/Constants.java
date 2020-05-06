@@ -1,8 +1,11 @@
 package com.restaurant.util;
 
+import com.restaurant.bll.Restaurant;
+
 public class Constants {
 
-    private static String SERIALIZABLE_NAME = "Restaurant.data";
+    public static Restaurant restaurantInstance;
+    private static String SERIALIZABLE_NAME = "Restaurant.ser";
     private static final int HASH_VAR = 35;
     private static final int MENU_ITEM_FIELD_NR = 2;
     private static  int ID = 0;

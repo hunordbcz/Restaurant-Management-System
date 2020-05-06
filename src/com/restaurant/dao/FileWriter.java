@@ -1,5 +1,7 @@
 package com.restaurant.dao;
 
+import com.restaurant.bll.MenuItem;
+import com.restaurant.bll.Restaurant;
 import com.restaurant.util.Constants;
 
 import java.io.FileNotFoundException;
@@ -18,13 +20,14 @@ public class FileWriter {
     }
 
     public void out(Object obj) throws IOException {
-        this.outputObj.writeObject(obj);
+        this.outputObj.writeObject((Restaurant)obj);
+        outputObj.flush();
     }
 
     public void close() {
         try {
-            outputFile.close();
             outputObj.close();
+            outputFile.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

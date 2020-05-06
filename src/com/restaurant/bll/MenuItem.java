@@ -1,15 +1,26 @@
 package com.restaurant.bll;
 
-import javax.swing.event.TableModelEvent;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Observable;
+import com.restaurant.util.Constants;
 
-public abstract class MenuItem {
+import javax.swing.event.TableModelEvent;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.*;
+
+public abstract class MenuItem extends Observable implements Serializable {
+    protected Integer ID;
     protected String type;
     protected String name;
     protected Double price;
     protected String date = new Timestamp(new Date().getTime()).getMonth() + "-" + new Timestamp(new Date().getTime()).getDay();
+
+    public Integer getID() {
+        return ID;
+    }
+
+    public void setID(Integer ID) {
+        this.ID = ID;
+    }
 
     public String getDate() {
         return date;

@@ -1,33 +1,39 @@
 package com.restaurant.bll;
 
-import com.restaurant.IRestaurantProcessing;
+import com.restaurant.dao.RestaurantSerializator;
 import com.restaurant.util.Helper;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.event.TableModelEvent;
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
+
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
-public class Restaurant extends Observable implements  Serializable, Observer {
+public class Restaurant extends Observable implements Serializable {
     private List<MenuItem> items;
-    private Map<Order, LinkedList<MenuItem>> orders;
+    private Map<Order, List<MenuItem>> orders;
     private static Restaurant restaurantInstance = null;
+    private static final long serialVersionUID = 123L;
 
     private Restaurant(){
-        items = new LinkedList<>();
+        items = new ArrayList<>();
+        orders = new HashMap<>();
     }
 
     public static Restaurant getInstance(){
         if(restaurantInstance == null){
-            restaurantInstance = new Restaurant();
+            Restaurant restaurant = new RestaurantSerializator().get();
+            restaurantInstance = Objects.requireNonNullElseGet(restaurant, Restaurant::new);
         }
 
         return restaurantInstance;
+    }
+
+    public static void setInstance(Restaurant restaurant) {
+        restaurantInstance = restaurant;
+    }
+
+    public void set(){
+        new RestaurantSerializator().set();
     }
 
     public List<MenuItem> getItems() {
@@ -36,12 +42,17 @@ public class Restaurant extends Observable implements  Serializable, Observer {
 
     public void addItem(MenuItem item) {
         insertItem(items.size(), item);
+//        item.addObserver(this);
     }
 
     public void insertItem(int pos, MenuItem item) {
+        assert(item != null);
+
         items.add(pos, item);
         setChanged();
         notifyObservers(TableModelEvent.INSERT);
+
+//        assert items.size() == +1
     }
 
     public void removeItem(int pos) {
@@ -56,58 +67,41 @@ public class Restaurant extends Observable implements  Serializable, Observer {
         notifyObservers(TableModelEvent.DELETE);
     }
 
-    
-    public void createMenuItem(@NotNull MenuItem item) {
-
-    }
-
-    
-    public void deleteMenuItem(MenuItem item) {
-
-    }
-
     public Object getMenuItemField(MenuItem item,  int nrField){
-        Object value = "~?~";
-        try {
-            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(Helper.getFieldName(MenuItem.class, nrField), MenuItem.class);
-            Method method = propertyDescriptor.getReadMethod();
-            value = method.invoke(item);
-        } catch (IntrospectionException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return value;
+        return Helper.getFieldValue(MenuItem.class, item, nrField);
     }
     
     public void editMenuItem(MenuItem item, Object aValue, int nrField) {
-        try {
-            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(Helper.getFieldName(MenuItem.class, nrField), MenuItem.class);
-            Method method = propertyDescriptor.getWriteMethod();
-            method.invoke(item, aValue);
-            setChanged();
-            notifyObservers(TableModelEvent.UPDATE);
-        } catch (IntrospectionException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
+        Helper.setFieldValue(MenuItem.class, item, aValue, nrField);
+        setChanged();
+        notifyObservers(TableModelEvent.UPDATE);
+    }
+    
+    public Order createOrder() {
+        Order order = new Order();
+        List<MenuItem> items = new ArrayList<>();
+        this.orders.put(order, items);
+        return order;
+    }
+
+    public void addItemToOrder(Order order, MenuItem item){
+        List<MenuItem> items = this.orders.get(order);
+        items.add(item);
+    }
+
+    public void addItemsToOrder(Order order, List<MenuItem> items) {
+        for (MenuItem item : items){
+            this.addItemToOrder(order, item);
         }
     }
 
-    
-    public void createOrder(Order order, ArrayList<MenuItem> menuItem) {
-
+    public void removeItemFromOrder(Order order, MenuItem item){
+        List<MenuItem> items = this.orders.get(order);
+        items.remove(item);
     }
 
-    
-    public int computeOrderPrice(Order order) {
-        return 0;
-    }
-
-    
-    public void generateBill(String whatToPrint) {
-
-    }
-
-    
     public void update(Observable o, Object arg) {
         setChanged();
-        notifyObservers(TableModelEvent.UPDATE);
+        notifyObservers(arg);
     }
 }

@@ -6,39 +6,35 @@ import com.restaurant.util.Constants;
 import java.io.*;
 
 public class RestaurantSerializator {
-    private static FileWriter fileWriter;
-    private static FileReader<Restaurant> fileReader;
+    String fileName;
 
-    static {
-        String fileName = Constants.getSerializableName();
-
-        try {
-            fileWriter = new FileWriter(fileName);
-            fileReader = new FileReader<>(fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public RestaurantSerializator(String fileName){
+        this.fileName = fileName;
     }
 
-    public static void set(Restaurant restaurant) {
+    public RestaurantSerializator(){
+        this. fileName = Constants.getSerializableName();
+    }
+
+    public void set() {
         try {
-            fileWriter.out(restaurant);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+            FileWriter fileWriter = new FileWriter(fileName);
+            fileWriter.out(Restaurant.getInstance());
             fileWriter.close();
+        } catch (IOException i) {
+            i.printStackTrace();
         }
     }
 
-    public static Restaurant get() {
+    public Restaurant get() {
         Restaurant restaurant;
+
         try {
+            FileReader<Restaurant> fileReader = new FileReader<>(fileName);
             restaurant = fileReader.in();
-        } catch (IOException | ClassNotFoundException i) {
-            restaurant = Restaurant.getInstance();
-            set(restaurant);
-        }  finally {
             fileReader.close();
+        } catch (IOException | ClassNotFoundException e) {
+            restaurant = null;
         }
 
         return restaurant;

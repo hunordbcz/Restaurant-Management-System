@@ -33,7 +33,7 @@ public class AdministratorGUI extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
         this.setVisible(true);
-        model = new MenuItemTableModel(Restaurant.getInstance().getItems(), false, true);
+        model = new MenuItemTableModel(Restaurant.getInstance().getItems(), true, null);
         Restaurant.getInstance().addObserver(model);
         table1.setAutoCreateColumnsFromModel(true);
         table1.setModel(model);
@@ -45,17 +45,28 @@ public class AdministratorGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 selectionModel.clearSelection();
-                BaseProduct data = new BaseProduct(textField1.getText(), Double.parseDouble(textField3.getText()));
+                String name = textField1.getText();
+                if(name.length()<1){
+                    JOptionPane.showMessageDialog(null, "Wrong Name", "Error in Inputs", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                double price = 0D;
+                try{
+                    price = Double.parseDouble(textField3.getText());
+                }catch (Exception ex){
+                    JOptionPane.showMessageDialog(null, "Wrong price", "Error in Inputs", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                BaseProduct data = new BaseProduct(name, price);
                 Restaurant.getInstance().addItem(data);
             }
         });
 
-        table1.addMouseListener(new MouseAdapter() {
-        });
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int[] selectedRows = table1.getSelectedRows();
                 if (selectedRows.length == 0) {
                     JOptionPane.showMessageDialog(null, "You must select atleast an item!", "Error on Delete", JOptionPane.ERROR_MESSAGE);
                 }
@@ -63,7 +74,6 @@ public class AdministratorGUI extends JFrame {
                 for (int i = selectedRows.length - 1; i >= 0; i--) {
                     model.removeItem(selectedRows[i]);
                 }
-                selectionModel.clearSelection();
             }
         });
 
@@ -72,27 +82,25 @@ public class AdministratorGUI extends JFrame {
         createCompositeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                int []selectedProducts = selectedRows;
                 CompositeProduct product = new CompositeProduct(textField1.getText());
-                selectedRows = table1.getSelectedRows();
-                for (MenuItem item : model.getItems(selectedRows)) {
+                for (MenuItem item : model.getItems(selectedProducts)) {
                     product.addProduct(item);
                 }
                 Restaurant.getInstance().addItem(product);
-                selectionModel.clearSelection();
             }
         });
         editCompositeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectionModel.clearSelection();
                 createButton.setEnabled(false);
                 createCompositeButton.setEnabled(false);
                 editCompositeButton.setEnabled(false);
                 backButton.setEnabled(true);
 
-                CompositeProduct compositeProduct = (CompositeProduct) model.getItem(table1.getSelectedRow());
+                CompositeProduct compositeProduct = (CompositeProduct) model.getItem(selectedRows[0]);
 
-                model = new MenuItemTableModel(compositeProduct.getProducts(), true, true);
+                model = new MenuItemTableModel(compositeProduct.getProducts(), true, compositeProduct);
                 Restaurant.getInstance().addObserver(model);
 
                 table1.setModel(model);
@@ -102,13 +110,12 @@ public class AdministratorGUI extends JFrame {
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                selectionModel.clearSelection();
                 createButton.setEnabled(true);
                 createCompositeButton.setEnabled(true);
                 editCompositeButton.setEnabled(true);
                 backButton.setEnabled(false);
 
-                model = new MenuItemTableModel(Restaurant.getInstance().getItems(), false, true);
+                model = new MenuItemTableModel(Restaurant.getInstance().getItems(), true, null);
                 Restaurant.getInstance().addObserver(model);
 
                 table1.setModel(model);
@@ -116,15 +123,11 @@ public class AdministratorGUI extends JFrame {
         });
         selectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+//                return;
                 if (e.getValueIsAdjusting()) {
                     return;
                 }
-                int[] selectedRows;
-                if(AdministratorGUI.selectedRows != null){
-                    selectedRows = AdministratorGUI.selectedRows;
-                }else{
-                    selectedRows = table1.getSelectedRows();
-                }
+                AdministratorGUI.selectedRows = table1.getSelectedRows();
 
                 System.out.println(selectedRows.length);
                 switch (selectedRows.length){
@@ -144,6 +147,9 @@ public class AdministratorGUI extends JFrame {
 
                         int hasComposite = 0;
                         for(int selectedRow : selectedRows){
+                            if(selectedRow >= model.getRowCount()){
+                                break;
+                            }
                             if(model.getItem(selectedRow) instanceof CompositeProduct){
                                 hasComposite++;
                             }
@@ -159,20 +165,5 @@ public class AdministratorGUI extends JFrame {
                 }
             }
         });
-    }
-
-    public void showBug(JTable jt) {
-        int[] rows = jt.getSelectedRows();
-        System.out.println("These rows are selected:");
-        for (int i : rows)
-            System.out.print(i + " ");
-        System.out.println();
-        if (rows.length > 0)
-            jt.getModel().getValueAt(rows[rows.length - 1], 0);
-
-    }
-
-    private void createUIComponents() {
-
     }
 }
