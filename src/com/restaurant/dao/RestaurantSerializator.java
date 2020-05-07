@@ -13,7 +13,7 @@ public class RestaurantSerializator {
     }
 
     public RestaurantSerializator(){
-        this. fileName = Constants.getSerializableName();
+        this.fileName = Constants.getSerializableName();
     }
 
     public void set() {

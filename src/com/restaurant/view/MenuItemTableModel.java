@@ -67,8 +67,7 @@ public class MenuItemTableModel extends AbstractTableModel implements Observer {
     public void removeItem(int row) {
         MenuItem item = getItem(row);
         if (compositeProduct != null) {
-            source.remove(item);
-            compositeProduct.recalculatePrice();
+            compositeProduct.removeProduct(item);
             fireTableRowsDeleted(row, row);
         } else {
             restaurant.removeItem(item);

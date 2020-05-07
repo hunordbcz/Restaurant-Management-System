@@ -13,8 +13,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.beans.VetoableChangeListener;
+import java.util.Observable;
+import java.util.Observer;
 
-public class AdministratorGUI extends JFrame {
+public class AdministratorGUI extends JFrame implements Observer {
     private JPanel administrator;
     private JTextField textField1;
     private JTextField textField3;
@@ -34,7 +36,6 @@ public class AdministratorGUI extends JFrame {
         this.pack();
         this.setVisible(true);
         model = new MenuItemTableModel(Restaurant.getInstance().getItems(), true, null);
-        Restaurant.getInstance().addObserver(model);
         table1.setAutoCreateColumnsFromModel(true);
         table1.setModel(model);
         table1.getTableHeader().setReorderingAllowed(false);
@@ -71,8 +72,9 @@ public class AdministratorGUI extends JFrame {
                     JOptionPane.showMessageDialog(null, "You must select atleast an item!", "Error on Delete", JOptionPane.ERROR_MESSAGE);
                 }
 
-                for (int i = selectedRows.length - 1; i >= 0; i--) {
-                    model.removeItem(selectedRows[i]);
+                int[] rowsToDelete = selectedRows;
+                for (int i = rowsToDelete.length - 1; i >= 0; i--) {
+                    model.removeItem(rowsToDelete[i]);
                 }
             }
         });
@@ -101,7 +103,6 @@ public class AdministratorGUI extends JFrame {
                 CompositeProduct compositeProduct = (CompositeProduct) model.getItem(selectedRows[0]);
 
                 model = new MenuItemTableModel(compositeProduct.getProducts(), true, compositeProduct);
-                Restaurant.getInstance().addObserver(model);
 
                 table1.setModel(model);
 
@@ -116,7 +117,6 @@ public class AdministratorGUI extends JFrame {
                 backButton.setEnabled(false);
 
                 model = new MenuItemTableModel(Restaurant.getInstance().getItems(), true, null);
-                Restaurant.getInstance().addObserver(model);
 
                 table1.setModel(model);
             }
@@ -165,5 +165,10 @@ public class AdministratorGUI extends JFrame {
                 }
             }
         });
+    }
+
+    @Override
+    public void update(Observable o, Object arg) {
+        model.update(o,arg);
     }
 }

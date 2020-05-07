@@ -20,7 +20,7 @@ public class CompositeProduct extends MenuItem {
 
     public void addProduct(MenuItem product) {
         this.products.add(product);
-        this.price += product.getPrice();
+        recalculatePrice();
     }
 
     public Boolean removeProduct(MenuItem product) {
@@ -28,7 +28,7 @@ public class CompositeProduct extends MenuItem {
             return false;
         }
         this.products.remove(product);
-        this.price -= product.getPrice();
+        recalculatePrice();
 
         return true;
     }

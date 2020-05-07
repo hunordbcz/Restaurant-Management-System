@@ -30,6 +30,10 @@ public class Constants {
         return ++ID;
     }
 
+    public static void setID(int IDStart){
+        ID = IDStart;
+    }
+
     public static int getMenuItemFieldNr() {
         return MENU_ITEM_FIELD_NR;
     }

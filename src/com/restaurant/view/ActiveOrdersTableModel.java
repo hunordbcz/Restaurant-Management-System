@@ -1,6 +1,5 @@
 package com.restaurant.view;
 
-import com.restaurant.bll.MenuItem;
 import com.restaurant.bll.Order;
 import com.restaurant.bll.Restaurant;
 import com.restaurant.util.Helper;
@@ -12,23 +11,15 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-public abstract class AbstractRestaurantTableModel<T> extends AbstractTableModel implements Observer {
-    protected List<T> source;
-    private final Class<T> type;
-    private Boolean isEditable = false;
+//public class ActiveOrdersTableModel extends AbstractRestaurantTableModel<Order> {
+public class ActiveOrdersTableModel extends AbstractTableModel {
+    private List<Order> source;
+    private Restaurant restaurant;
 
-    public AbstractRestaurantTableModel(List<T> source, Class<T> type, Boolean isEditable) {
-        this.source = source;
-        this.type = type;
-        this.isEditable = isEditable;
-    }
-
-    public AbstractRestaurantTableModel(List<T> source, Class<T> type){
-        if(source == null){
-            source = new ArrayList<T>();
-        }
-        this.source = source;
-        this.type = type;
+    public ActiveOrdersTableModel(List<Order> src) {
+        restaurant = Restaurant.getInstance();
+//        restaurant.addObserver(this);
+        this.source = src;
     }
 
     @Override
@@ -38,46 +29,44 @@ public abstract class AbstractRestaurantTableModel<T> extends AbstractTableModel
 
     @Override
     public int getColumnCount() {
-        return type.getDeclaredFields().length;
+        return Order.class.getDeclaredFields().length;
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return Helper.getFieldClass(type, columnIndex);
+        return Helper.getFieldClass(Order.class, columnIndex);
     }
 
     @Override
     public String getColumnName(int columnIndex) {
-        return Helper.getFieldName(type, columnIndex).toUpperCase();
+        return Helper.getFieldName(Order.class, columnIndex).toUpperCase();
     }
 
     @Override
-    public abstract Object getValueAt(int rowIndex, int columnIndex);
-
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return isEditable;
+    public Object getValueAt(int rowIndex, int columnIndex){
+        Order order = this.getItem(rowIndex);
+        return Helper.getFieldValue(Order.class, order, columnIndex);
     }
 
-    public T getItem(int row) {
+    public Order getItem(int row) {
         return source.get(row);
     }
 
-    public List<T> getItems(int[] rows){
-        List<T> items = new ArrayList<>();
+    public List<Order> getItems(int[] rows){
+        List<Order> items = new ArrayList<>();
         for(int row : rows){
             items.add(getItem(row));
         }
         return items;
     }
 
-    public void addItem(T item){
+    public void addItem(Order item){
         this.source.add(item);
         fireTableRowsInserted(0, getRowCount());
     }
 
-    public void addItems(List<T> items){
-        for (T item : items){
+    public void addItems(List<Order> items){
+        for (Order item : items){
             this.addItem(item);
         }
     }
@@ -93,7 +82,6 @@ public abstract class AbstractRestaurantTableModel<T> extends AbstractTableModel
         }
     }
 
-    @Override
     public void update(Observable o, Object arg) {
         switch ((int) arg) {
             case TableModelEvent.INSERT:

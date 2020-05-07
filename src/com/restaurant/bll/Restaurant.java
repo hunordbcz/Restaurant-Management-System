@@ -1,6 +1,7 @@
 package com.restaurant.bll;
 
 import com.restaurant.dao.RestaurantSerializator;
+import com.restaurant.util.Constants;
 import com.restaurant.util.Helper;
 
 import javax.swing.event.TableModelEvent;
@@ -8,11 +9,10 @@ import javax.swing.event.TableModelEvent;
 import java.io.Serializable;
 import java.util.*;
 
-public class Restaurant extends Observable implements Serializable {
+public class Restaurant extends Observable implements Serializable, Observer {
     private List<MenuItem> items;
     private Map<Order, List<MenuItem>> orders;
     private static Restaurant restaurantInstance = null;
-    private static final long serialVersionUID = 123L;
 
     private Restaurant(){
         items = new ArrayList<>();
@@ -23,6 +23,8 @@ public class Restaurant extends Observable implements Serializable {
         if(restaurantInstance == null){
             Restaurant restaurant = new RestaurantSerializator().get();
             restaurantInstance = Objects.requireNonNullElseGet(restaurant, Restaurant::new);
+            int ID = restaurantInstance.getItems().size() + restaurantInstance.getOrders().size();
+            Constants.setID(ID);
         }
 
         return restaurantInstance;
@@ -42,12 +44,11 @@ public class Restaurant extends Observable implements Serializable {
 
     public void addItem(MenuItem item) {
         insertItem(items.size(), item);
-//        item.addObserver(this);
     }
 
     public void insertItem(int pos, MenuItem item) {
         assert(item != null);
-
+        item.addObserver(this);
         items.add(pos, item);
         setChanged();
         notifyObservers(TableModelEvent.INSERT);
@@ -77,16 +78,23 @@ public class Restaurant extends Observable implements Serializable {
         notifyObservers(TableModelEvent.UPDATE);
     }
     
-    public Order createOrder() {
-        Order order = new Order();
+    public Order createOrder(int table) {
+        Order order = new Order(table);
         List<MenuItem> items = new ArrayList<>();
         this.orders.put(order, items);
+
+        setChanged();
+        notifyObservers(TableModelEvent.UPDATE);
+
         return order;
     }
 
     public void addItemToOrder(Order order, MenuItem item){
-        List<MenuItem> items = this.orders.get(order);
+        List<MenuItem> items = getOrderItems(order);
         items.add(item);
+        order.calculatePrice();
+        setChanged();
+        notifyObservers(TableModelEvent.UPDATE);
     }
 
     public void addItemsToOrder(Order order, List<MenuItem> items) {
@@ -95,13 +103,25 @@ public class Restaurant extends Observable implements Serializable {
         }
     }
 
+    public  List<MenuItem> getOrderItems(Order order){
+        return this.orders.get(order);
+    }
+
     public void removeItemFromOrder(Order order, MenuItem item){
         List<MenuItem> items = this.orders.get(order);
         items.remove(item);
+        order.calculatePrice();
+        setChanged();
+        notifyObservers(TableModelEvent.UPDATE);
     }
 
+    public List<Order> getOrders() {
+        return new ArrayList<>(this.orders.keySet());
+    }
+
+    @Override
     public void update(Observable o, Object arg) {
         setChanged();
-        notifyObservers(arg);
+        notifyObservers(TableModelEvent.UPDATE);
     }
 }
