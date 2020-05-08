@@ -1,4 +1,4 @@
-package view;
+package presentation;
 
 import bll.CompositeProduct;
 import bll.MenuItem;
@@ -10,9 +10,8 @@ import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
-import java.util.Observer;
 
-public class MenuItemTableModel extends AbstractTableModel implements Observer {
+public class MenuItemTableModel extends AbstractTableModel {
     private Restaurant restaurant;
     private List<MenuItem> source;
     private CompositeProduct compositeProduct;
@@ -90,7 +89,6 @@ public class MenuItemTableModel extends AbstractTableModel implements Observer {
         return columnIndex > 1 && isEditable;
     }
 
-    @Override
     public void update(Observable o, Object arg) {
         switch ((int) arg) {
             case TableModelEvent.INSERT:

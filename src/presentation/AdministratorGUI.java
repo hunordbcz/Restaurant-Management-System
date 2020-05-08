@@ -1,4 +1,4 @@
-package view;
+package presentation;
 
 import bll.BaseProduct;
 import bll.CompositeProduct;
