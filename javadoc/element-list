@@ -1,6 +1,5 @@
-com.restaurant
+unnamed package
 bll
-controller
 dao
+presentation
 util
-view
