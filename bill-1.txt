@@ -1,0 +1,15 @@
+Bill #1 - Table 1
+Date: 2020-05-08 03:49:18.337
+Pizza + Lemonade	~	Price: 35.0
+
+Pizza + Lemonade	~	Price: 35.0
+
+Pizza	~	Price: 25.0
+
+Water	~	Price: 5.0
+
+Pizza	~	Price: 25.0
+
+Water	~	Price: 5.0
+
+Total: 130.0

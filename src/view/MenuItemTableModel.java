@@ -60,10 +60,6 @@ public class MenuItemTableModel extends AbstractTableModel implements Observer {
         }
     }
 
-    public void insertItem(int row, MenuItem item) {
-        source.add(row, item);
-    }
-
     public void removeItem(int row) {
         MenuItem item = getItem(row);
         if (compositeProduct != null) {

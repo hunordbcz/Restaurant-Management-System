@@ -10,14 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-//public class ActiveOrdersTableModel extends AbstractRestaurantTableModel<Order> {
 public class ActiveOrdersTableModel extends AbstractTableModel {
     private List<Order> source;
     private Restaurant restaurant;
 
     public ActiveOrdersTableModel(List<Order> src) {
         restaurant = Restaurant.getInstance();
-//        restaurant.addObserver(this);
         this.source = src;
     }
 
@@ -64,21 +62,9 @@ public class ActiveOrdersTableModel extends AbstractTableModel {
         fireTableRowsInserted(0, getRowCount());
     }
 
-    public void addItems(List<Order> items){
-        for (Order item : items){
-            this.addItem(item);
-        }
-    }
-
     public void removeItem(int row) {
         this.source.remove(row);
         fireTableRowsDeleted(row, row);
-    }
-
-    public void removeItems(int[] selectedRows){
-        for (int i = selectedRows.length - 1; i >= 0; i--) {
-            this.removeItem(selectedRows[i]);
-        }
     }
 
     public void update(Observable o, Object arg) {

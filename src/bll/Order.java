@@ -15,7 +15,7 @@ public class Order extends Observable implements Serializable {
     private int ID;
     private int table;
     private double totalPrice;
-    private String date = new Timestamp(new Date().getTime()).getMonth() + "-" + new Timestamp(new Date().getTime()).getDay();
+    private String date = new Timestamp(new Date().getTime()).toString();
 
     public Order(int table) {
         this.ID = Constants.getOrderID();
@@ -82,11 +82,15 @@ public class Order extends Observable implements Serializable {
 
     @Override
     public String toString() {
-        return "Order{" +
-                "ID=" + ID +
-                ", table=" + table +
-                ", totalPrice=" + totalPrice +
-                ", date='" + date + '\'' +
-                '}';
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Bill #").append(ID).append(" - Table ").append(table).append("\n");
+        stringBuilder.append("Date: ").append(date).append("\n");
+
+        List<MenuItem> items = Restaurant.getInstance().getOrderItems(this);
+        for (MenuItem item : items) {
+            stringBuilder.append(item.getName()).append("\t~\tPrice: ").append(item.getPrice()).append("\n\n");
+        }
+        stringBuilder.append("Total: ").append(totalPrice);
+        return stringBuilder.toString();
     }
 }

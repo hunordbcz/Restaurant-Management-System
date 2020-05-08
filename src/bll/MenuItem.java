@@ -10,7 +10,7 @@ public abstract class MenuItem extends Observable implements Serializable {
     protected String type;
     protected String name;
     protected Double price;
-    protected String date = new Timestamp(new Date().getTime()).getMonth() + "-" + new Timestamp(new Date().getTime()).getDay();
+    protected String date = new Timestamp(new Date().getTime()).toString();
 
     public Integer getID() {
         return ID;

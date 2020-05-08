@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-//public class OrderItemsTableModel extends AbstractRestaurantTableModel<MenuItem> {
 public class OrderItemsTableModel extends AbstractTableModel {
     private List<MenuItem> source;
     private Restaurant restaurant;
@@ -86,24 +85,4 @@ public class OrderItemsTableModel extends AbstractTableModel {
             this.removeItem(selectedRows[i]);
         }
     }
-
-//    public void makeOrder(int[] selectedRows){
-////        List<MenuItem> items = this.getItems(selectedRows);
-////        restaurant.addItemsToOrder(order, items);
-//    }
-
-//    public void update(Observable o, Object arg) {
-//        switch ((int) arg) {
-//            case TableModelEvent.INSERT:
-//                fireTableRowsInserted(0, getRowCount());
-//                break;
-//            case TableModelEvent.UPDATE:
-//                fireTableRowsUpdated(0, getRowCount());
-//                break;
-//            case TableModelEvent.DELETE:
-//                fireTableRowsDeleted(0, getRowCount());
-//            default:
-//                break;
-//        }
-//    }
 }
